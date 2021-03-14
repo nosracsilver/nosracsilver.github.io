@@ -1,7 +1,7 @@
 Nosrac Silver:
   name        : "Nosrac Silver"
   bio         : "Researcher. Engineer. Developer."
-  avatar      : "/assets/images/nosrac.jpg"
+  avatar      : "/assets/images/nosrac.png"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
