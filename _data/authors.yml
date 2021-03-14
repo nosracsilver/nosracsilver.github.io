@@ -1,0 +1,17 @@
+Nosrac Silver:
+  name        : "Nosrac Silver"
+  bio         : "Researcher. Engineer. Developer."
+  avatar      : "/assets/images/nosrac.jpg"
+  links:
+    - label: "Email"
+      icon: "fas fa-fw fa-envelope-square"
+      url: "mailto:nosrac@nosrac.io"
+    - label: "Website"
+      icon: "fas fa-fw fa-link"
+      url: "https://www.nosrac.io"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/nosracsilver"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/nosracsilver"
