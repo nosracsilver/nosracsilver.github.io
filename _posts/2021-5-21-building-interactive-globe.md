@@ -11,7 +11,7 @@ Building interactive visualizations in R is quickly becoming a popular method of
 
 To create this visualization, you'll need the following packages. These can easily be installed with the `install.packages()`command.
 
-```other
+```r
 library(plotly)
 library(countrycode)
 library(dplyr)
@@ -19,13 +19,13 @@ library(dplyr)
 
 Next, you’ll need to load the data into R. For this visualization I used COVID-19 global case count data from John Hopkins University. In this dataset, each row is data from an individual country, and each column is the cumulative case count for that particular day.
 
-```other
+```r
 global_case_data <- read.csv('https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
 ```
 
 In this dataset specifically, the United States was denoted as ‘US’. Given that the rest of the countries in this dataset were denoted by their full name, I decided to rename this data point for consistency. This step is entirely optional.
 
-```other
+```r
 global_case_data$Country.Region[250] <- "United States"
 ```
 
@@ -33,7 +33,7 @@ Another quirk of this dataset is that it has two country columns. The first deno
 
 First, I took the second column of the data frame, the country column, as a  list, and iterated through it. I then subsetted the data frame to contain just the rows pertaining to that country. If the number of rows in that subsetted data frame was equal to one, then that row was appended to a new data frame (`gc_data`). However, if the number of rows in the subsetted data frame was greater than one, I then summed the columns of each row to acquire a total day-by-day case count for all the states/provinces in that country.
 
-```other
+```r
 gc_data <- data.frame()
 for (country in unique(global_case_data$Country.Region)) {
   subset <- global_case_data %>% filter(Country.Region == country)
@@ -49,7 +49,7 @@ for (country in unique(global_case_data$Country.Region)) {
 
 Once the consolidation of the data was done, an extra column was appended to the case count data frame that contained the country code of each country in the dataset. This becomes relevant later on, as the country codes are needed to map the data onto the correct country.
 
-```other
+```r
 gc_data$Codes <- countrycode(gc_data$Country.Region, origin = 'country.name', 
 							 destination = 'iso3c') 
 gc_data <- rbind(gc_data, rep(FALSE, ncol(gc_data)))
@@ -57,7 +57,7 @@ gc_data <- rbind(gc_data, rep(FALSE, ncol(gc_data)))
 
 Now, specify the time intervals that you wish to be present in your slider. I picked the first of every month, starting from March 1st 2020, all the way to April 1st 2021.
 
-```other
+```r
 dates = c('X3.1.20', 'X4.1.20', 'X5.1.20', 'X6.1.20', 'X7.1.20', 
 		  'X8.1.20', 'X9.1.20', 'X10.1.20', 'X11.1.20', 'X12.1.20',
 		  'X1.1.21', 'X2.1.21', 'X3.1.21','X4.1.21')
@@ -65,7 +65,7 @@ dates = c('X3.1.20', 'X4.1.20', 'X5.1.20', 'X6.1.20', 'X7.1.20',
 
 To make the slider look nicer later on, I created labels for each of the dates.
 
-```other
+```r
 # Create print-ready labels for figure
 date_str = c('3/1/20', '4/1/20', '5/1/20', '6/1/20', '7/1/20', 
 		  '8/1/20', '9/1/20', '10/1/20', '11/1/20', '12/1/20',
@@ -74,13 +74,13 @@ date_str = c('3/1/20', '4/1/20', '5/1/20', '6/1/20', '7/1/20',
 
 Last (in terms of pre-processing the data), you want to ensure that the first date shown on the figure is visible by default (this is explained in more detail later).
 
-```other
+```r
 gc_data[nrow(gc_data), dates[1]] = TRUE
 ```
 
 In order to create a readable choropleth map, Plotly uses a series of settings that are defined as a list. These settings can of course be tweaked to however you want to create your map, however the following settings were used for the map. The only one that shouldn’t be changed (unless you are not aiming for a globe map view) is the `projection = list(type = 'orthographic’)` setting.  This is what creates a globe instead of another map view. [Click here for a list of other map views in Plotly.](https://plotly.com/python/map-configuration/#map-projections)
 
-```other
+```r
 border_settings <- list(color = toRGB("#000000"), width = 0.5)
 
 globe_settings <- list(
@@ -100,7 +100,7 @@ globe_settings <- list(
 
 After defining the settings for the map, I create the initial, generic map object. Right now, this plot object (named `fig` has no settings or context for the data).
 
-```other
+```r
 fig <- plot_geo(gc_data)
 ```
 
@@ -108,7 +108,7 @@ The next block of code is the most complex part of this tutorial. As mentioned a
 
 This loop also manages the visibility of the layers. As mentioned, I created a steps list that will store the visibility of the traces as I slide through the visualization. This section creates a series of nested lists, that set all visibilities but the specific trace to be visible. This allows for turning off traces as a new time is selected by the slider.
 
-```other
+```r
 steps <- list()
 for (i in 1:length(dates)) {
   fig <- fig %>% add_trace(z = ~gc_data[, dates[i]], 
@@ -130,7 +130,7 @@ for (i in 1:length(dates)) {
 
 Finally, I need to add the slider, and tie it to the figure. I do that with the following code. I can label the slider with the “current value” and prefix functionality, and steps can be passed in to modify visibility.
 
-```other
+```r
 fig <- fig %>%
   layout(sliders = list(list(active = 0,
 							 currentvalue = list(prefix = "Date: "),
@@ -143,7 +143,7 @@ From this point, the visualization is done. It can be viewed by simply calling `
 
 Running this will generate an interactive globe as intended by the tutorial. There are some memory management function calls that improve memory usage of this script that were not included in the tutorial. They are not strictly necessary, however they improve the performance of the script on low-powered machines.
 
-```other
+```r
 library(plotly)
 library(countrycode)
 library(dplyr)
